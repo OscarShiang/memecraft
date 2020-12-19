@@ -6,14 +6,18 @@ from flask import Flask, request, abort, send_file
 from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage
+    MessageEvent, TextMessage, TextSendMessage, 
+    TemplateSendMessage, MessageAction,
+    ImageCarouselTemplate, ImageCarouselColumn
 )
 
 from fsm import StateMachine
-from utils import send_text_message
+from utils import *
+from sql import Database
 
 app = Flask(__name__)
 
+database = Database()
 machine = StateMachine()
 
 # channel access token
@@ -43,7 +47,7 @@ def callback():
         if not isinstance(event.message, TextMessage):
             continue
 
-        linebot_api.reply_message(event.reply_token, TextSendMessage(text=event.message.text))
+        send_templates(event.reply_token, 'Meme templates', database.getMemes())
 
     return 'OK'
 
