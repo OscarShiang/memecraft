@@ -1,0 +1,11 @@
+# virtual env
+venv
+
+# cache
+__pycache__
+
+# macOS
+*.DS_Store
+
+# fsm picture
+fsm.png
