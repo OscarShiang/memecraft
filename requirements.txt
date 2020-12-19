@@ -9,6 +9,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.2
 line-bot-sdk==1.18.0
 MarkupSafe==1.1.1
+psycopg2-binary==2.8.6
 requests==2.25.1
 six==1.15.0
 transitions==0.8.5
