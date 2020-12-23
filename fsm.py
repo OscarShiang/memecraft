@@ -2,7 +2,7 @@ from transitions.extensions import GraphMachine
 from utils import *
 
 from sql import Database
-from render import renderImage
+from render import *
 from imgur import uploadImage
 
 from linebot.models import (
@@ -21,7 +21,9 @@ class StateMachine(GraphMachine):
             states=['asleep', 'show_temp', 'drake_text_1', 'drake_text_2',
                     'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
                     'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
-                    'show_result', 'show_usage', 'show_gallery'],
+                    'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
+                    'show_bless', 'show_meme', 'show_result', 'show_usage',
+                    'show_gallery'],
             initial='asleep',
             transitions=[
                 {
@@ -111,6 +113,42 @@ class StateMachine(GraphMachine):
                 {
                     'trigger': 'advance',
                     'source': 'asleep',
+                    'dest': 'lotus_1_text_1',
+                    'conditions': lambda event: event.message.text == 'lotus-1'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'lotus_1_text_1',
+                    'dest': 'show_result',
+                    'conditions': 'is_valid_text'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'lotus_2_text_1',
+                    'conditions': lambda event: event.message.text == 'lotus-2'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'lotus_2_text_1',
+                    'dest': 'show_result',
+                    'conditions': 'is_valid_text'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'peony_text_1',
+                    'conditions': lambda event: event.message.text == 'peony'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'peony_text_1',
+                    'dest': 'show_result',
+                    'conditions': 'is_valid_text'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'asleep',
                     'dest': 'show_usage',
                     'conditions': lambda event: event.message.text in ['usage', '使用說明']
                 },
@@ -118,6 +156,7 @@ class StateMachine(GraphMachine):
                     'trigger': 'cancel',
                     'source': ['drake_text_1', 'drake_text_2', 'show_usage', 'show_gallery',
                                'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
+                               'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                                'buttons_text_1', 'buttons_text_2', 'pikachu_text_1'],
                     'dest': 'asleep'
                 },
@@ -125,6 +164,7 @@ class StateMachine(GraphMachine):
                     'trigger': 'go_back',
                     'source': ['drake_text_1', 'drake_text_2', 'show_usage', 'show_gallery',
                                'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
+                               'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                                'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
                                'show_temp', 'show_result'],
                     'dest': 'asleep'
@@ -141,6 +181,7 @@ class StateMachine(GraphMachine):
         # use to render text
         self.kind = ''
         self.text_buf = []
+        self.bless = False
 
     def is_valid_text(self, event):
         text = event.message.text
@@ -155,6 +196,7 @@ class StateMachine(GraphMachine):
         print('Clear buffer')
         self.kind = ''
         self.text_buf.clear()
+        self.bless = False
         return True
 
     def on_enter_show_temp(self, event):
@@ -165,12 +207,21 @@ class StateMachine(GraphMachine):
     def on_enter_show_result(self, event):
         print(f'KIND = {self.kind}')
 
-        # render the picture
-        url = database.getURL(self.kind)
-        print(f'URL = {url}')
-        configs, color, font, fontsize = database.getConfigs(self.kind)
-        renderImage(url, self.text_buf, configs, font, fontsize, color)
-        link = uploadImage('upload.png', self.kind)
+        link = ''
+
+        if not self.bless:
+            # render the picture
+            url = database.getURL(self.kind)
+            print(f'URL = {url}')
+            configs, color, font, fontsize = database.getConfigs(self.kind)
+            renderImage(url, self.text_buf, configs, font, fontsize, color)
+            link = uploadImage('upload.png', self.kind)
+        else:
+            url = database.getBlessURL(self.kind)
+            print(f'URL = {url}')
+            configs, color, outline, font, fontsize = database.getBlessConfigs(self.kind)
+            renderImageWithOutline(url, self.text_buf, configs, font, fontsize, color, outline)
+            link = uploadImage('upload.png', self.kind)
 
         # reply the user
         token = event.reply_token
@@ -239,6 +290,36 @@ class StateMachine(GraphMachine):
         text = event.message.text
         self.kind = text
         print(f'KIND = {self.kind}')
+
+        token = event.reply_token
+        send_text_message(token, 'Please enter a message')
+    
+    def on_enter_lotus_1_text_1(self, event):
+        text = event.message.text
+        self.kind = text
+        self.bless = True
+        print(f'KIND = {self.kind}')
+        print(f'BLESS = {self.bless}')
+
+        token = event.reply_token
+        send_text_message(token, 'Please enter a message')
+
+    def on_enter_lotus_2_text_1(self, event):
+        text = event.message.text
+        self.kind = text
+        self.bless = True
+        print(f'KIND = {self.kind}')
+        print(f'BLESS = {self.bless}')
+
+        token = event.reply_token
+        send_text_message(token, 'Please enter a message')
+
+    def on_enter_peony_text_1(self, event):
+        text = event.message.text
+        self.kind = text
+        self.bless = True
+        print(f'KIND = {self.kind}')
+        print(f'BLESS = {self.bless}')
 
         token = event.reply_token
         send_text_message(token, 'Please enter a message')

@@ -23,6 +23,11 @@ class Database():
         self.cursor.execute(query)
         return self.cursor.fetchone()[0]
 
+    def getBlessURL(self, kind):
+        query = f'''SELECT url FROM bless_templates WHERE name = '{kind}';'''
+        self.cursor.execute(query)
+        return self.cursor.fetchone()[0]
+
     def getConfigs(self, kind):
         query = f'''SELECT pos, color, font, fontsize FROM meme_configs WHERE kind = '{kind}';'''
         self.cursor.execute(query)
@@ -36,6 +41,21 @@ class Database():
         font = f'font/{font}'
 
         return configs, color, font, fontsize
+
+    def getBlessConfigs(self, kind):
+        query = f'''SELECT pos, color, outline, font, fontsize FROM bless_configs WHERE kind = '{kind}';'''
+        self.cursor.execute(query)
+        
+        data = self.cursor.fetchall()
+        print(data)
+
+        configs, color, outline, font, fontsize = data[0]
+        configs = eval(configs)
+        color = eval(color)
+        outline = eval(outline)
+        font = f'font/{font}'
+
+        return configs, color, outline, font, fontsize
 
     def uploadGallery(self, kind, url):
         query = f'''INSERT INTO meme_gallery (kind, url) VALUES ('{kind}', '{url}');'''
