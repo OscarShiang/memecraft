@@ -13,11 +13,9 @@ from linebot.models import (
 
 from fsm import StateMachine
 from utils import *
-from sql import Database
 
 app = Flask(__name__)
 
-database = Database()
 machine = StateMachine()
 
 # channel access token
@@ -47,7 +45,7 @@ def callback():
         if not isinstance(event.message, TextMessage):
             continue
 
-        send_templates(event.reply_token, 'Meme templates', database.getMemes())
+        send_usage(event.reply_token)
 
     return 'OK'
 
@@ -73,9 +71,13 @@ def webhook_handler():
         if not isinstance(event.message.text, str):
             continue
         # print(f"REQUEST BODY: \n{body}")
-        response = machine.advance(event)
-        if response == False:
-            send_text_message(event.reply_token, "Not Entering any State")
+        try:
+            response = machine.advance(event)
+            if response == False:
+                send_text_message(event.reply_token, "Not entering any State")
+        except:
+            send_text_message(event.reply_token, 'Error occurs. Try again later.')
+            machine.go_back()
 
         print(f"\nFSM STATE: {machine.state}")
 
