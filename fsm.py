@@ -19,7 +19,8 @@ class StateMachine(GraphMachine):
             model = self,
             name='Memecraft State Graph',
             states=['asleep', 'show_temp', 'drake_text_1', 'drake_text_2',
-                    'distracted', 'pigeon', 'two-buttons', 'pikachu', 'show_result'],
+                    'distracted', 'pigeon', 'two-buttons', 'pikachu', 'show_result',
+                    'show_usage'],
             initial='asleep',
             transitions=[
                 {
@@ -47,13 +48,19 @@ class StateMachine(GraphMachine):
                     'conditions': 'is_valid_text'
                 },
                 {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'show_usage',
+                    'conditions': lambda event: event.message.text in ['usage', '使用說明']
+                },
+                {
                     'trigger': 'cancel',
                     'source': ['drake_text_1', 'drake_text_2', 'distracted', 'pigeon', 'two-buttons', 'pikachu'],
                     'dest': 'asleep'
                 },
                 {
                     'trigger': 'go_back',
-                    'source': ['show_temp', 'distracted', 'pigeon', 'two-buttons', 'pikachu', 'show_result'],
+                    'source': ['show_temp', 'distracted', 'pigeon', 'two-buttons', 'pikachu', 'show_result', 'show_usage'],
                     'dest': 'asleep'
                 }
             ]
@@ -117,3 +124,8 @@ class StateMachine(GraphMachine):
 
         token = event.reply_token
         send_text_message(token, 'the second text')
+
+    def on_enter_show_usage(self, event):
+        token = event.reply_token
+        send_usage(token)
+        self.go_back()

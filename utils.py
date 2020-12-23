@@ -4,7 +4,7 @@ from linebot import LineBotApi, WebhookParser
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, ImageSendMessage,
     ImageMessage, TemplateSendMessage, MessageAction,
-    ImageCarouselTemplate, ImageCarouselColumn
+    ImageCarouselTemplate, ImageCarouselColumn, ButtonsTemplate
 )
 
 from sql import Database
@@ -48,3 +48,24 @@ def send_templates(reply_token, alt_text, info):
     line_bot_api.reply_message(reply_token, msg)
 
     return 'OK'
+
+def send_usage(reply_token):
+    msg = TemplateSendMessage(
+        alt_text='Linebot Usage',
+        template=ButtonsTemplate(
+            thumbnail_image_url='https://i.imgur.com/iaDRkA7.png',
+            title='Memecraft', text='Creating memes from messages',
+            actions=[
+                MessageAction(
+                    label='Browse templates', text='templates'
+                ),
+                MessageAction(
+                    label='Upload memes', text='upload'
+                ), 
+                MessageAction(
+                    label='View Gallery', text='gallery'
+                )
+            ]
+        )
+    )
+    line_bot_api.reply_message(reply_token, msg)
