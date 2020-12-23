@@ -43,10 +43,10 @@ class Database():
         self.conn.commit()
 
     def getMemesFromGallery(self, kind=None):
-        query = f'''SELECT * FROM gallery'''
+        query = f'''SELECT * FROM meme_gallery'''
         if kind:
             query += f''' WHERE kind = {kind}'''
-        query += ';'
+        query += ' order by id DESC LIMIT 10;'
 
         self.cursor.execute(query)
 
