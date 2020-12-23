@@ -3,8 +3,8 @@ import os
 from linebot import LineBotApi, WebhookParser
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, ImageSendMessage,
-    ImageMessage, TemplateSendMessage, MessageAction,
-    ImageCarouselTemplate, ImageCarouselColumn, ButtonsTemplate
+    ImageMessage, TemplateSendMessage, MessageAction, CarouselTemplate,
+    ImageCarouselTemplate, ImageCarouselColumn, CarouselColumn, ButtonsTemplate
 )
 
 from sql import Database
@@ -21,6 +21,38 @@ def send_img_message(reply_token, img_url):
     msg = ImageSendMessage(
         original_content_url=img_url,
         preview_image_url=img_url
+    )
+    line_bot_api.reply_message(reply_token, msg)
+
+def send_templates_menu(reply_token):
+    msg = TemplateSendMessage(
+        alt_text='Select the kind of template',
+        template=CarouselTemplate(
+            columns=[
+                CarouselColumn(
+                    thumbnail_image_url='https://i.imgur.com/TZUeq4A.png',
+                    title='Memes',
+                    text='Share your ideas with friends',
+                    actions=[
+                        MessageAction(
+                            label='Choose it',
+                            text='show_memes'
+                        )
+                    ]
+                ),
+                CarouselColumn(
+                    thumbnail_image_url='https://i.imgur.com/14aCD1P.jpg',
+                    title="Grandparents' blessing",
+                    text='Give away warm greetings',
+                    actions=[
+                        MessageAction(
+                            label='Choose it',
+                            text='show_blesses'
+                        )
+                    ]
+                )
+            ]
+        )
     )
     line_bot_api.reply_message(reply_token, msg)
 

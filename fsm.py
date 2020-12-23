@@ -22,7 +22,7 @@ class StateMachine(GraphMachine):
                     'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
                     'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
                     'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
-                    'show_bless', 'show_meme', 'show_result', 'show_usage',
+                    'show_blesses', 'show_memes', 'show_result', 'show_usage',
                     'show_gallery'],
             initial='asleep',
             transitions=[
@@ -153,6 +153,18 @@ class StateMachine(GraphMachine):
                     'conditions': lambda event: event.message.text in ['usage', '使用說明']
                 },
                 {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'show_memes',
+                    'conditions': lambda event: event.message.text == 'show_memes'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'show_blesses',
+                    'conditions': lambda event: event.message.text == 'show_blesses'
+                },
+                {
                     'trigger': 'cancel',
                     'source': ['drake_text_1', 'drake_text_2', 'show_usage', 'show_gallery',
                                'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
@@ -166,7 +178,7 @@ class StateMachine(GraphMachine):
                                'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
                                'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                                'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
-                               'show_temp', 'show_result'],
+                               'show_temp', 'show_result', 'show_memes', 'show_blesses'],
                     'dest': 'asleep'
                 },
                 {
@@ -201,7 +213,17 @@ class StateMachine(GraphMachine):
 
     def on_enter_show_temp(self, event):
         reply_token = event.reply_token
+        send_templates_menu(reply_token)
+        self.go_back()
+
+    def on_enter_show_memes(self, event):
+        reply_token = event.reply_token
         send_templates(reply_token, 'meme templates', database.getMemes())
+        self.go_back()
+
+    def on_enter_show_blesses(self, event):
+        reply_token = event.reply_token
+        send_templates(reply_token, 'bless templates', database.getBlesses())
         self.go_back()
     
     def on_enter_show_result(self, event):

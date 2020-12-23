@@ -18,6 +18,11 @@ class Database():
         self.cursor.execute(query)
         return self.cursor.fetchall()
 
+    def getBlesses(self):
+        query = '''SELECT * FROM bless_templates order by id'''
+        self.cursor.execute(query)
+        return self.cursor.fetchall()
+
     def getURL(self, kind):
         query = f'''SELECT url FROM meme_templates WHERE name = '{kind}';'''
         self.cursor.execute(query)
