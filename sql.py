@@ -38,7 +38,7 @@ class Database():
         return configs, color, font, fontsize
 
     def uploadGallery(self, kind, url):
-        query = f'''INSERT INTO meme_gallery (kind, url) VALUES ('{kind}, '{url}');'''
+        query = f'''INSERT INTO meme_gallery (kind, url) VALUES ('{kind}', '{url}');'''
         self.cursor.execute(query)
         self.conn.commit()
 
