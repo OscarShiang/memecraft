@@ -69,3 +69,28 @@ def send_usage(reply_token):
         )
     )
     line_bot_api.reply_message(reply_token, msg)
+
+def send_gallery(reply_token, memes):
+    # preprocess the info data
+    columns = []
+    for (idx, name, url) in memes:
+        columns.append(
+            ImageCarouselColumn(
+                image_url=url,
+                action=MessageAction(
+                    label='Share now',
+                    text='share'
+                )
+            )
+        )
+
+    # compile the message
+    msg = TemplateSendMessage(
+        alt_text='Image template test',
+        template=ImageCarouselTemplate(
+            columns=columns
+        )
+    )
+    line_bot_api.reply_message(reply_token, msg)
+
+    return 'OK'
