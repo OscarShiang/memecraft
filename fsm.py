@@ -19,8 +19,8 @@ class StateMachine(GraphMachine):
             model = self,
             name='Memecraft State Graph',
             states=['asleep', 'show_temp', 'drake_text_1', 'drake_text_2',
-                    'distracted', 'pigeon', 'two-buttons', 'pikachu', 'show_result',
-                    'show_usage'],
+                    'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
+                    'two-buttons', 'pikachu', 'show_result', 'show_usage', 'test'],
             initial='asleep',
             transitions=[
                 {
@@ -50,18 +50,57 @@ class StateMachine(GraphMachine):
                 {
                     'trigger': 'advance',
                     'source': 'asleep',
+                    'dest': 'boyfriend_text_1',
+                    'conditions': lambda event: event.message.text == 'distracted-boyfriend'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'boyfriend_text_1',
+                    'dest': 'boyfriend_text_2',
+                    'conditions': 'is_valid_text'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'boyfriend_text_2',
+                    'dest': 'show_result',
+                    'conditions': 'is_valid_text'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'pigeon_text_1',
+                    'conditions': lambda event: event.message.text == 'is-this-a-pigeon'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'pigeon_text_1',
+                    'dest': 'show_result',
+                    'conditions': 'is_valid_text'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'asleep',
                     'dest': 'show_usage',
                     'conditions': lambda event: event.message.text in ['usage', '使用說明']
                 },
                 {
                     'trigger': 'cancel',
-                    'source': ['drake_text_1', 'drake_text_2', 'distracted', 'pigeon', 'two-buttons', 'pikachu'],
+                    'source': ['drake_text_1', 'drake_text_2', 'boyfriend_text_1', 'boyfriend_text_2',
+                               'pigeon_text_1', 'distracted', 'pigeon', 'two-buttons', 'pikachu'],
                     'dest': 'asleep'
                 },
                 {
                     'trigger': 'go_back',
-                    'source': ['show_temp', 'distracted', 'pigeon', 'two-buttons', 'pikachu', 'show_result', 'show_usage'],
+                    'source': ['asleep', 'show_temp', 'drake_text_1', 'drake_text_2',
+                               'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
+                               'two-buttons', 'pikachu', 'show_result', 'show_usage', 'test'],
                     'dest': 'asleep'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'test',
+                    'conditions': lambda event: event.message.text == 'test'
                 }
             ]
         )
@@ -125,7 +164,37 @@ class StateMachine(GraphMachine):
         token = event.reply_token
         send_text_message(token, 'the second text')
 
+    def on_enter_boyfriend_text_1(self, event):
+        text = event.message.text
+        self.kind = text
+        print(f'KIND = {self.kind}')
+
+        token = event.reply_token
+        send_text_message(token, 'the first text')
+
+    def on_enter_boyfriend_text_2(self, event):
+        text = event.message.text
+        print(f'KIND = {self.kind}')
+
+        token = event.reply_token
+        send_text_message(token, 'the second text')
+
+    def on_enter_pigeon_text_1(self, event):
+        text = event.message.text
+        print(f'KIND = {self.kind}')
+        self.kind = text
+
+        token = event.reply_token
+        send_text_message(token, 'enter the text')
+
     def on_enter_show_usage(self, event):
         token = event.reply_token
         send_usage(token)
+        self.go_back()
+    
+    def on_enter_test(self, event):
+        memes = database.getMemesFromGallery()
+
+        token = event.reply_token
+        send_gallery(token, memes)
         self.go_back()
