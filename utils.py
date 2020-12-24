@@ -44,7 +44,7 @@ def send_templates_menu(reply_token):
                 ),
                 CarouselColumn(
                     thumbnail_image_url='https://i.imgur.com/14aCD1P.jpg',
-                    title="Grandparents' blessing",
+                    title="Grandparents' blessings",
                     text='Give away warm greetings',
                     actions=[
                         MessageAction(
