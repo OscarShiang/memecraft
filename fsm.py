@@ -23,7 +23,7 @@ class StateMachine(GraphMachine):
                     'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
                     'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                     'show_blesses', 'show_memes', 'show_result', 'show_usage',
-                    'show_gallery', 'upload_meme', 'get_pic_from_gallery'],
+                    'show_gallery', 'show_menu', 'upload_meme', 'get_pic_from_gallery'],
             initial='asleep',
             transitions=[
                 {
@@ -187,6 +187,12 @@ class StateMachine(GraphMachine):
                     'conditions': lambda event: event.message.text[:12].lower() == 'show_gallery'
                 },
                 {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'show_menu',
+                    'conditions': lambda event: event.message.text.lower() == 'menu'
+                },
+                {
                     'trigger': 'cancel',
                     'source': ['drake_text_1', 'drake_text_2', 'show_usage', 'show_gallery',
                                'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
@@ -201,7 +207,7 @@ class StateMachine(GraphMachine):
                                'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                                'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
                                'show_temp', 'show_result', 'show_memes', 'show_blesses',
-                               'get_pic_from_gallery'],
+                               'show_menu', 'get_pic_from_gallery'],
                     'dest': 'asleep'
                 },
                 {
@@ -385,6 +391,11 @@ class StateMachine(GraphMachine):
             send_text_message(token, 'Uploading succeed')
 
             database.uploadGallery('user-upload', link)
+
+    def on_enter_show_menu(self, event):
+        token = event.reply_token
+        send_menu(token)
+        self.go_back(event)
 
     def on_enter_show_usage(self, event):
         token = event.reply_token

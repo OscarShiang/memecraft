@@ -83,9 +83,9 @@ def send_templates(reply_token, alt_text, info):
 
     return 'OK'
 
-def send_usage(reply_token):
+def send_menu(reply_token):
     msg = TemplateSendMessage(
-        alt_text='Linebot Usage',
+        alt_text='Memecraft Menu',
         template=ButtonsTemplate(
             thumbnail_image_url='https://i.imgur.com/iaDRkA7.png',
             title='Memecraft', text='Creating memes from messages',
@@ -97,7 +97,53 @@ def send_usage(reply_token):
                     label='Upload memes', text='upload_image'
                 ), 
                 MessageAction(
-                    label='View Gallery', text='gallery'
+                    label='View gallery', text='gallery'
+                ),
+                MessageAction(
+                    label='Show usages', text='usage'
+                )
+            ]
+        )
+    )
+    line_bot_api.reply_message(reply_token, msg)
+
+def send_usage(reply_token):
+    msg = TemplateSendMessage(
+        alt_text='Memecraft Usages',
+        template=CarouselTemplate(
+            columns=[
+                CarouselColumn(
+                    thumbnail_image_url='https://i.imgur.com/PZCJwp6.png',
+                    title='Make memes',
+                    text='Creating your own memes with templates',
+                    actions=[
+                        MessageAction(
+                            label='Try it',
+                            text='templates'
+                        )
+                    ]
+                ),
+                CarouselColumn(
+                    thumbnail_image_url='https://i.imgur.com/m8xhUiD.png',
+                    title="Upload works",
+                    text='Share your creativity with others',
+                    actions=[
+                        MessageAction(
+                            label='Try it',
+                            text='upload_image'
+                        )
+                    ]
+                ),
+                CarouselColumn(
+                    thumbnail_image_url='https://i.imgur.com/ncpaICm.png',
+                    title="View gallery",
+                    text='View great works in meme gallery',
+                    actions=[
+                        MessageAction(
+                            label='Try it',
+                            text='gallery'
+                        )
+                    ]
                 )
             ]
         )
