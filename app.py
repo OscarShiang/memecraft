@@ -85,9 +85,12 @@ def webhook_handler():
         try:
             response = machine.advance(event)
             if response == False:
-                send_text_message(event.reply_token, "Not entering any State")
+                print("[ERROR] Not entering any State")
+                send_menu(event.reply_token)
+                
         except:
-            send_text_message(event.reply_token, 'Error occurs. Try again later.')
+            print('Error occurs, back to initial state.')
+            send_menu(event.reply_token)
             machine.go_back()
 
         print(f"\nFSM STATE: {machine.state}")
