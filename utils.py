@@ -1,5 +1,7 @@
 import os
 
+import urllib3
+
 from linebot import LineBotApi, WebhookParser
 from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, ImageSendMessage,
@@ -92,7 +94,7 @@ def send_usage(reply_token):
                     label='Browse templates', text='templates'
                 ),
                 MessageAction(
-                    label='Upload memes', text='upload'
+                    label='Upload memes', text='upload_image'
                 ), 
                 MessageAction(
                     label='View Gallery', text='gallery'
@@ -126,3 +128,17 @@ def send_gallery(reply_token, memes):
     line_bot_api.reply_message(reply_token, msg)
 
     return 'OK'
+
+def getImageFromLineAPI(msgId):
+    http = urllib3.PoolManager()
+    header = {
+        'Authorization': f'Bearer {channel_access_token}'
+    }
+    try:
+        re = http.request('GET', f'https://api-data.line.me/v2/bot/message/{msgId}/content', headers=header)
+        with open('tmp.png', 'wb') as f:
+            f.write(re.data)
+        return True
+    except:
+        return False
+    

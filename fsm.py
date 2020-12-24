@@ -23,14 +23,14 @@ class StateMachine(GraphMachine):
                     'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
                     'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                     'show_blesses', 'show_memes', 'show_result', 'show_usage',
-                    'show_gallery'],
+                    'show_gallery', 'upload_meme'],
             initial='asleep',
             transitions=[
                 {
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'show_temp',
-                    'conditions': lambda event : event.message.text.lower() == 'templates'
+                    'conditions': lambda event : event.message.text.lower() in ['templates', '模板']
                 },
                 {
                     'trigger': 'advance',
@@ -54,7 +54,7 @@ class StateMachine(GraphMachine):
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'boyfriend_text_1',
-                    'conditions': lambda event: event.message.text == 'distracted-boyfriend'
+                    'conditions': lambda event: event.message.text.lower() == 'distracted-boyfriend'
                 },
                 {
                     'trigger': 'advance',
@@ -72,7 +72,7 @@ class StateMachine(GraphMachine):
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'pigeon_text_1',
-                    'conditions': lambda event: event.message.text == 'is-this-a-pigeon'
+                    'conditions': lambda event: event.message.text.lower() == 'is-this-a-pigeon'
                 },
                 {
                     'trigger': 'advance',
@@ -84,7 +84,7 @@ class StateMachine(GraphMachine):
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'buttons_text_1',
-                    'conditions': lambda event: event.message.text == 'two-buttons'
+                    'conditions': lambda event: event.message.text.lower() == 'two-buttons'
                 },
                 {
                     'trigger': 'advance',
@@ -102,7 +102,7 @@ class StateMachine(GraphMachine):
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'pikachu_text_1',
-                    'conditions': lambda event: event.message.text == 'surprised-pikachu'
+                    'conditions': lambda event: event.message.text.lower() == 'surprised-pikachu'
                 },
                 {
                     'trigger': 'advance',
@@ -114,7 +114,7 @@ class StateMachine(GraphMachine):
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'lotus_1_text_1',
-                    'conditions': lambda event: event.message.text == 'lotus-1'
+                    'conditions': lambda event: event.message.text.lower() == 'lotus-1'
                 },
                 {
                     'trigger': 'advance',
@@ -126,7 +126,7 @@ class StateMachine(GraphMachine):
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'lotus_2_text_1',
-                    'conditions': lambda event: event.message.text == 'lotus-2'
+                    'conditions': lambda event: event.message.text.lower() == 'lotus-2'
                 },
                 {
                     'trigger': 'advance',
@@ -138,7 +138,7 @@ class StateMachine(GraphMachine):
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'peony_text_1',
-                    'conditions': lambda event: event.message.text == 'peony'
+                    'conditions': lambda event: event.message.text.lower() == 'peony'
                 },
                 {
                     'trigger': 'advance',
@@ -150,19 +150,35 @@ class StateMachine(GraphMachine):
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'show_usage',
-                    'conditions': lambda event: event.message.text in ['usage', '使用說明']
+                    'conditions': lambda event: event.message.text.lower() in ['usage', '使用說明', '說明']
                 },
                 {
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'show_memes',
-                    'conditions': lambda event: event.message.text == 'show_memes'
+                    'conditions': lambda event: event.message.text.lower() == 'show_memes'
                 },
                 {
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'show_blesses',
-                    'conditions': lambda event: event.message.text == 'show_blesses'
+                    'conditions': lambda event: event.message.text.lower() == 'show_blesses'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'upload_meme',
+                    'conditions': lambda event: event.message.text.lower() == 'upload_image'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'upload_meme',
+                    'dest': 'asleep',
+                },
+                {
+                    'trigger': 'image_advance',
+                    'source': 'upload_meme',
+                    'dest': 'asleep'
                 },
                 {
                     'trigger': 'cancel',
@@ -185,7 +201,7 @@ class StateMachine(GraphMachine):
                     'trigger': 'advance',
                     'source': 'asleep',
                     'dest': 'show_gallery',
-                    'conditions': lambda event: event.message.text == 'gallery'
+                    'conditions': lambda event: event.message.text.lower() == 'gallery'
                 }
             ]
         )
@@ -204,7 +220,7 @@ class StateMachine(GraphMachine):
             self.cancel()
             return False
 
-    def on_enter_asleep(self):
+    def on_enter_asleep(self, event):
         print('Clear buffer')
         self.kind = ''
         self.text_buf.clear()
@@ -261,14 +277,14 @@ class StateMachine(GraphMachine):
         print(f'KIND = {self.kind}')
 
         token = event.reply_token
-        send_text_message(token, 'the first text')
+        send_text_message(token, 'Please enter text for top area')
 
     def on_enter_drake_text_2(self, event):
         text = event.message.text
         print(f'KIND = {self.kind}')
 
         token = event.reply_token
-        send_text_message(token, 'the second text')
+        send_text_message(token, 'Please enter text for bottom area')
 
     def on_enter_boyfriend_text_1(self, event):
         text = event.message.text
@@ -276,14 +292,14 @@ class StateMachine(GraphMachine):
         print(f'KIND = {self.kind}')
 
         token = event.reply_token
-        send_text_message(token, 'the first text')
+        send_text_message(token, 'Please enter the left text')
 
     def on_enter_boyfriend_text_2(self, event):
         text = event.message.text
         print(f'KIND = {self.kind}')
 
         token = event.reply_token
-        send_text_message(token, 'the second text')
+        send_text_message(token, 'Please enter the right text')
 
     def on_enter_pigeon_text_1(self, event):
         text = event.message.text
@@ -291,7 +307,7 @@ class StateMachine(GraphMachine):
         self.kind = text
 
         token = event.reply_token
-        send_text_message(token, 'enter the text')
+        send_text_message(token, 'Please enter a text')
 
     def on_enter_buttons_text_1(self, event):
         text = event.message.text
@@ -299,14 +315,14 @@ class StateMachine(GraphMachine):
         print(f'KIND = {self.kind}')
 
         token = event.reply_token
-        send_text_message(token, 'the first text')
+        send_text_message(token, 'Please enter text for left button')
 
     def on_enter_buttons_text_2(self, event):
         text = event.message.text
         print(f'KIND = {self.kind}')
 
         token = event.reply_token
-        send_text_message(token, 'the second text')
+        send_text_message(token, 'Please enter text for right button')
 
     def on_enter_pikachu_text_1(self, event):
         text = event.message.text
@@ -345,6 +361,23 @@ class StateMachine(GraphMachine):
 
         token = event.reply_token
         send_text_message(token, 'Please enter a message')
+
+    def on_enter_upload_meme(self, event):
+        token = event.reply_token
+
+        send_text_message(token, 'Please send an image')
+
+    def on_exit_upload_meme(self, event):
+        token = event.reply_token
+
+        if isinstance(event.message, TextMessage):
+            send_text_message(token, 'Uploading failed')
+        if isinstance(event.message, ImageMessage):
+            getImageFromLineAPI(event.message.id)
+            link = uploadImage('tmp.png', 'user-upload')
+            send_text_message(token, 'Uploading succeed')
+
+            database.uploadGallery('user-upload', link)
 
     def on_enter_show_usage(self, event):
         token = event.reply_token

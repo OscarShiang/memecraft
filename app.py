@@ -66,11 +66,22 @@ def webhook_handler():
     for event in events:
         if not isinstance(event, MessageEvent):
             continue
-        if not isinstance(event.message, TextMessage):
+        if not isinstance(event.message, TextMessage) and not isinstance(event.message, ImageMessage):
             continue
+
+        # print(f"REQUEST BODY: \n{body}")
+
+        if isinstance(event.message, ImageMessage):
+            # process images
+            print('IMAGE ADVANCE')
+            res = machine.image_advance(event)
+            if res == False:
+                send_text_message(event.reply_token, "Not entering any state")
+            continue
+
         if not isinstance(event.message.text, str):
             continue
-        # print(f"REQUEST BODY: \n{body}")
+
         try:
             response = machine.advance(event)
             if response == False:
