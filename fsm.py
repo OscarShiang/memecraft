@@ -230,17 +230,17 @@ class StateMachine(GraphMachine):
     def on_enter_show_temp(self, event):
         reply_token = event.reply_token
         send_templates_menu(reply_token)
-        self.go_back()
+        self.go_back(event)
 
     def on_enter_show_memes(self, event):
         reply_token = event.reply_token
         send_templates(reply_token, 'meme templates', database.getMemes())
-        self.go_back()
+        self.go_back(event)
 
     def on_enter_show_blesses(self, event):
         reply_token = event.reply_token
         send_templates(reply_token, 'bless templates', database.getBlesses())
-        self.go_back()
+        self.go_back(event)
     
     def on_enter_show_result(self, event):
         print(f'KIND = {self.kind}')
@@ -268,8 +268,7 @@ class StateMachine(GraphMachine):
         # upload to gallery
         database.uploadGallery(self.kind, link)
 
-        self.go_back()
-        return 'OK'
+        self.go_back(event)
 
     def on_enter_drake_text_1(self, event):
         text = event.message.text
@@ -382,11 +381,11 @@ class StateMachine(GraphMachine):
     def on_enter_show_usage(self, event):
         token = event.reply_token
         send_usage(token)
-        self.go_back()
+        self.go_back(event)
     
     def on_enter_show_gallery(self, event):
         memes = database.getMemesFromGallery()
 
         token = event.reply_token
         send_gallery(token, memes)
-        self.go_back()
+        self.go_back(event)
