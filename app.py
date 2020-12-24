@@ -1,15 +1,10 @@
 import os
-import sys
 
 from flask import Flask, request, abort, send_file
 
 from linebot import LineBotApi, WebhookParser
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, 
-    TemplateSendMessage, MessageAction,
-    ImageCarouselTemplate, ImageCarouselColumn
-)
+from linebot.models import MessageEvent, TextMessage
 
 from fsm import StateMachine
 from utils import *
@@ -104,4 +99,4 @@ def show_fsm():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    app.run(host = '0.0.0.0', port = port)
+    app.run(host='0.0.0.0', port=port)
