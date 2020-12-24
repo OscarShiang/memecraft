@@ -107,13 +107,13 @@ def send_usage(reply_token):
 def send_gallery(reply_token, memes):
     # preprocess the info data
     columns = []
-    for (idx, name, url) in memes:
+    for i, (idx, name, url) in enumerate(memes):
         columns.append(
             ImageCarouselColumn(
                 image_url=url,
                 action=MessageAction(
                     label='Share now',
-                    text='share'
+                    text=f'show_gallery_{i}'
                 )
             )
         )

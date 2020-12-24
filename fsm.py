@@ -23,7 +23,7 @@ class StateMachine(GraphMachine):
                     'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
                     'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                     'show_blesses', 'show_memes', 'show_result', 'show_usage',
-                    'show_gallery', 'upload_meme'],
+                    'show_gallery', 'upload_meme', 'get_pic_from_gallery'],
             initial='asleep',
             transitions=[
                 {
@@ -181,6 +181,12 @@ class StateMachine(GraphMachine):
                     'dest': 'asleep'
                 },
                 {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'get_pic_from_gallery',
+                    'conditions': lambda event: event.message.text[:12].lower() == 'show_gallery'
+                },
+                {
                     'trigger': 'cancel',
                     'source': ['drake_text_1', 'drake_text_2', 'show_usage', 'show_gallery',
                                'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
@@ -194,7 +200,8 @@ class StateMachine(GraphMachine):
                                'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
                                'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                                'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
-                               'show_temp', 'show_result', 'show_memes', 'show_blesses'],
+                               'show_temp', 'show_result', 'show_memes', 'show_blesses',
+                               'get_pic_from_gallery'],
                     'dest': 'asleep'
                 },
                 {
@@ -209,6 +216,7 @@ class StateMachine(GraphMachine):
         # use to render text
         self.kind = ''
         self.text_buf = []
+        self.gallery_cache = database.getMemesFromGallery()
         self.bless = False
 
     def is_valid_text(self, event):
@@ -384,8 +392,18 @@ class StateMachine(GraphMachine):
         self.go_back(event)
     
     def on_enter_show_gallery(self, event):
-        memes = database.getMemesFromGallery()
+        self.gallery_cache = database.getMemesFromGallery()
 
         token = event.reply_token
-        send_gallery(token, memes)
+        send_gallery(token, self.gallery_cache)
+        self.go_back(event)
+
+    def on_enter_get_pic_from_gallery(self, event):
+        parsed_text = event.message.text.split('_')
+        index = eval(parsed_text[2])
+
+        token = event.reply_token
+        url = self.gallery_cache[index][2]
+        send_img_message(token, url)
+
         self.go_back(event)
