@@ -23,7 +23,8 @@ class StateMachine(GraphMachine):
                     'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
                     'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                     'show_blesses', 'show_memes', 'show_result', 'show_usage',
-                    'show_gallery', 'show_menu', 'upload_meme', 'get_pic_from_gallery'],
+                    'show_gallery', 'show_menu', 'upload_meme', 'get_pic_from_gallery',
+                    'show_fsm'],
             initial='asleep',
             transitions=[
                 {
@@ -193,6 +194,12 @@ class StateMachine(GraphMachine):
                     'conditions': lambda event: event.message.text.lower() == 'menu'
                 },
                 {
+                    'trigger': 'advance',
+                    'source': 'asleep',
+                    'dest': 'show_fsm',
+                    'conditions': lambda event: event.message.text.lower() == 'fsm'
+                },
+                {
                     'trigger': 'cancel',
                     'source': ['drake_text_1', 'drake_text_2', 'show_usage', 'show_gallery',
                                'boyfriend_text_1', 'boyfriend_text_2', 'pigeon_text_1',
@@ -207,7 +214,7 @@ class StateMachine(GraphMachine):
                                'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                                'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
                                'show_temp', 'show_result', 'show_memes', 'show_blesses',
-                               'show_menu', 'get_pic_from_gallery'],
+                               'show_menu', 'get_pic_from_gallery', 'show_fsm'],
                     'dest': 'asleep'
                 },
                 {
@@ -417,4 +424,9 @@ class StateMachine(GraphMachine):
         url = self.gallery_cache[index][2]
         send_img_message(token, url)
 
+        self.go_back(event)
+
+    def on_enter_show_fsm(self, event):
+        token = event.reply_token
+        send_img_message(token, 'https://memecraft-bot.herokuapp.com/show_fsm')
         self.go_back(event)
