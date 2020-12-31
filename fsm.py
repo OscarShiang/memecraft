@@ -24,7 +24,7 @@ class StateMachine(GraphMachine):
                     'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                     'show_blesses', 'show_memes', 'show_result', 'show_usage',
                     'show_gallery', 'show_menu', 'upload_meme', 'get_pic_from_gallery',
-                    'show_fsm'],
+                    'show_fsm', 'test_state'],
             initial='asleep',
             transitions=[
                 {
@@ -190,6 +190,12 @@ class StateMachine(GraphMachine):
                 {
                     'trigger': 'advance',
                     'source': 'asleep',
+                    'dest': 'test_state',
+                    'conditions': lambda event: event.message.text[:5].lower() == 'test_'
+                },
+                {
+                    'trigger': 'advance',
+                    'source': 'asleep',
                     'dest': 'show_menu',
                     'conditions': lambda event: event.message.text.lower() == 'menu'
                 },
@@ -214,7 +220,7 @@ class StateMachine(GraphMachine):
                                'lotus_1_text_1', 'peony_text_1', 'lotus_2_text_1',
                                'buttons_text_1', 'buttons_text_2', 'pikachu_text_1',
                                'show_temp', 'show_result', 'show_memes', 'show_blesses',
-                               'show_menu', 'get_pic_from_gallery', 'show_fsm'],
+                               'show_menu', 'get_pic_from_gallery', 'show_fsm', 'test_state'],
                     'dest': 'asleep'
                 },
                 {
@@ -424,6 +430,13 @@ class StateMachine(GraphMachine):
         url = self.gallery_cache[index][2]
         send_img_message(token, url)
 
+        self.go_back(event)
+
+    def on_enter_test_state(self, event):
+        parsed_text = event.message.text.split('_')
+
+        token = event.reply_token
+        send_text_message(token, parsed_text[1])
         self.go_back(event)
 
     def on_enter_show_fsm(self, event):
