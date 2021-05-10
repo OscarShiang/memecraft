@@ -1,4 +1,5 @@
 from os import getenv
+
 import pyimgur
 
 IMGUR_CLIENT_ID = getenv('IMGUR_CLIENT_ID')

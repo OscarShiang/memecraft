@@ -1,5 +1,7 @@
-from PIL import Image, ImageFont, ImageDraw
 from urllib.request import urlopen
+
+from PIL import Image, ImageDraw, ImageFont
+
 
 def renderImage(url, texts, configs, font_family, fontsize, color):
     img = Image.open(urlopen(url))

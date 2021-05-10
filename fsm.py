@@ -1,13 +1,11 @@
+from linebot.models import (ImageMessage, MessageEvent, StickerMessage,
+                            TextMessage, TextSendMessage)
 from transitions.extensions import GraphMachine
-from utils import *
 
-from sql import Database
-from render import *
 from imgur import uploadImage
-
-from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage, ImageMessage, StickerMessage
-)
+from render import *
+from sql import Database
+from utils import *
 
 database = Database()
 
